@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .calculator {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            width: 340px;
+        }
+
+        .display {
+            background: #0f0f1a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: right;
+            min-height: 90px;
+            color: white;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            word-break: break-all;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            border: none;
+            border-radius: 12px;
+            padding: 22px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: #16213e;
+            color: white;
+            transition: 0.15s;
+        }
+
+        button:hover {
+            background: #0f3460;
+        }
+
+        .operator {
+            background: #e94560;
+        }
+
+        .operator:hover {
+            background: #ff6b81;
+        }
+
+        .clear, .delete {
+            background: #533483;
+        }
+
+        .clear:hover, .delete:hover {
+            background: #6a4c9c;
+        }
+
+        .span-two {
+            grid-column: span 2;
+        }
+
+        .equals {
+            background: #e94560;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+
+        <div class="buttons">
+            <button class="span-two clear" onclick="clearDisplay()">AC</button>
+            <button class="delete" onclick="deleteLast()">DEL</button>
+            <button class="operator" onclick="append('/')">/</button>
+
+            <button onclick="append('7')">7</button>
+            <button onclick="append('8')">8</button>
+            <button onclick="append('9')">9</button>
+            <button class="operator" onclick="append('*')">*</button>
+
+            <button onclick="append('4')">4</button>
+            <button onclick="append('5')">5</button>
+            <button onclick="append('6')">6</button>
+            <button class="operator" onclick="append('-')">-</button>
+
+            <button onclick="append('1')">1</button>
+            <button onclick="append('2')">2</button>
+            <button onclick="append('3')">3</button>
+            <button class="operator" onclick="append('+')">+</button>
+
+            <button class="span-two" onclick="append('0')">0</button>
+            <button onclick="append('.')">.</button>
+            <button class="equals" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let current = '0';
+        let shouldReset = false;
+
+        function update() {
+            display.innerText = current;
+        }
+
+        function append(value) {
+            if (shouldReset) {
+                current = '';
+                shouldReset = false;
+            }
+
+            if (current === '0' && value !== '.') {
+                current = value;
+            } else {
+                // Prevent multiple dots
+                if (value === '.' && current.includes('.')) return;
+                current += value;
+            }
+            update();
+        }
+
+        function clearDisplay() {
+            current = '0';
+            shouldReset = false;
+            update();
+        }
+
+        function deleteLast() {
+            if (current.length === 1) {
+                current = '0';
+            } else {
+                current = current.slice(0, -1);
+            }
+            update();
+        }
+
+        function calculate() {
+            try {
+                // Replace × and ÷ if any, but we use * and /
+                let result = eval(current);
+                current = result.toString();
+                shouldReset = true;
+                update();
+            } catch (error) {
+                current = 'Error';
+                shouldReset = true;
+                update();
+            }
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', function(e) {
+            if (e.key >= '0' && e.key <= '9') append(e.key);
+            if (e.key === '.') append('.');
+            if (e.key === '+') append('+');
+            if (e.key === '-') append('-');
+            if (e.key === '') append('');
+            if (e.key === '/') {
+                e.preventDefault();
+                append('/');
+            }
+            if (e.key === 'Enter' || e.key === '=') {
+                e.preventDefault();
+                calculate();
+            }
+            if (e.key === 'Backspace') deleteLast();
+            if (e.key === 'Escape') clearDisplay();
+        });
+    </script>
+</body>
+</html>
